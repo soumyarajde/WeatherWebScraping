@@ -1,0 +1,5 @@
+source,url
+stadt_reutlingen,https://www.reutlingen.de/wetter
+wetter_com,https://www.wetter.com/deutschland/reutlingen/betzingen/DE0008826006.html
+wetter_net,https://www.wetter.net/wetter/deutschland/reutlingen/vorhersage-fuer-tag-3
+home_assistant,http://192.168.0.12:8123
