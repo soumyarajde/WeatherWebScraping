@@ -46,8 +46,11 @@ class WeatherSource:
         if Path(self.html_path).exists():
             html_content = Path(self.html_path).read_text(encoding='utf-8')
         else:
+            # set custom user agent
+            headers = {"User-Agent": "EducationalWebScrapingBot/1.0 (https://www.iu-akademie.de/weiterbildungen/data-analyst-python/)"}
+    
             # read the content of URL provided over HTTP
-            response = requests.get(self.html_path, timeout=15)
+            response = requests.get(self.html_path,headers=headers, timeout=15)
             response.raise_for_status()
             html_content = response.text
         # parse the HTML content
