@@ -8,6 +8,7 @@ import sys
 import time
 import datetime
 import h5py
+import pandas as pd
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -116,14 +117,24 @@ try:
     # store data in HDF5 file
     date_str = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
-    with h5py.File("weather_ha.h5", "a") as f:
-        # Top-level group is the date
-        date_grp = f.require_group(date_str)
-        # Subgroup is 'home_assistant'
-        ha_grp = date_grp.require_group("home_assistant")
-        # Datasets
-        ha_grp["high_temp"] = high_temp
-        ha_grp["low_temp"] = low_temp
+    # with h5py.File("weather_ha.h5", "a") as f:
+    #     # Top-level group is the date
+    #     date_grp = f.require_group(date_str)
+    #     # Subgroup is 'home_assistant'
+    #     ha_grp = date_grp.require_group("home_assistant")
+    #     # Datasets
+    #     ha_grp["high_temp"] = high_temp
+    #     ha_grp["low_temp"] = low_temp
+
+    df = pd.DataFrame({
+    'date': [date_str],
+    'source': ["home_assistant"],
+    'high_temp': [high_temp],
+    'low_temp': [low_temp]
+            })
+    # Append the data to an HDF5 file in table format
+    # Use 'a' mode to append data, and 'weather_data' as the key in the store
+    df.to_hdf("weather_combined_sort_v2.h5", key='weather', mode='a', format='table',append=True, data_columns=True)
 
     time.sleep(5)  # pause for headless debug
    

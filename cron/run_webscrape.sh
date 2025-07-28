@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/spec/pydatasci/WeatherWebscraping/
-/usr/bin/python /home/spec/pydatasci/WeatherWebscraping/webscrape.py
+cd /home/spec/pydatasci/WeatherWebScraping/
+/usr/bin/python webscrape.py

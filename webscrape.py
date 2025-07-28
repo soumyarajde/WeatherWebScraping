@@ -4,6 +4,7 @@ import datetime
 import h5py
 import csv
 import requests
+import pandas as pd
 
 
 class WeatherSource:
@@ -218,16 +219,40 @@ class WeatherDataManager:
             source (str): Name of the weather data source.
         """
 
+        # date_key = datetime.date.today().isoformat()
+        # with h5py.File(hdf5_file, 'a') as h5f:
+        #     day_grp = h5f.require_group(date_key)
+        #     src_grp = day_grp.require_group(source)
+        #     if 'high_temp' in src_grp:
+        #         del src_grp['high_temp']
+        #     if 'low_temp' in src_grp:
+        #         del src_grp['low_temp']
+        #     src_grp.create_dataset('high_temp', data=high_temp)
+        #     src_grp.create_dataset('low_temp',  data=low_temp)
+
+        # Get the current date in ISO format
         date_key = datetime.date.today().isoformat()
-        with h5py.File(hdf5_file, 'a') as h5f:
-            day_grp = h5f.require_group(date_key)
-            src_grp = day_grp.require_group(source)
-            if 'high_temp' in src_grp:
-                del src_grp['high_temp']
-            if 'low_temp' in src_grp:
-                del src_grp['low_temp']
-            src_grp.create_dataset('high_temp', data=high_temp)
-            src_grp.create_dataset('low_temp',  data=low_temp)
+        print(date_key)
+
+        # Create a DataFrame with a single row of the current data
+        df = pd.DataFrame({
+            'date': [date_key],
+            'source': [source],
+            'high_temp': [high_temp],
+            'low_temp': [low_temp]
+        })
+        # Make sure  dtypes for the numeric columns are *always* float64
+        df = df.astype({'high_temp': 'float64', 'low_temp': 'float64'})
+        # Append the data to an HDF5 file in table format
+        # Use 'a' mode to append data, and 'weather_data' as the key in the store
+        df.to_hdf(
+            hdf5_file,
+            key='weather',
+            mode='a',
+            format='table',
+            append=True,
+            data_columns=True
+        )
 
     def capture_weather(self):
         """
@@ -264,7 +289,7 @@ class WeatherDataManager:
 
 if __name__=='__main__':
     # Instantiate WeatherDataManager with path to HDF5 file and csv source list
-    weather_manager= WeatherDataManager('weather.h5','weather_sources.csv')
+    weather_manager= WeatherDataManager('weather_combined_sort_v2.h5','weather_sources.csv')
    
     weather_manager.capture_weather()
     
