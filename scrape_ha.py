@@ -114,17 +114,9 @@ try:
     max_unit  = find_in_shadow(max_info, "span.measurement").text.strip()
     print(f"Outside Temperature Max Yesterday: {max_value}{max_unit}")
 
-    # store data in HDF5 file
+    # Store data in HDF5 file
+    # Date string is set to  yesterday
     date_str = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-
-    # with h5py.File("weather_ha.h5", "a") as f:
-    #     # Top-level group is the date
-    #     date_grp = f.require_group(date_str)
-    #     # Subgroup is 'home_assistant'
-    #     ha_grp = date_grp.require_group("home_assistant")
-    #     # Datasets
-    #     ha_grp["high_temp"] = high_temp
-    #     ha_grp["low_temp"] = low_temp
 
     df = pd.DataFrame({
     'date': [date_str],

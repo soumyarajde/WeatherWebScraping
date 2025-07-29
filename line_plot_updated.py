@@ -12,14 +12,11 @@ df['date'] = pd.to_datetime(df['date'])
 df = df.sort_values("date").reset_index(drop=True)
 
 key_cols = ['date', 'source']          # the columns that together must be unique
-# find duplicate rows (same col1+col2) – keep=False marks every occurrence
+# find duplicate rows (same date and source) – keep=False marks every occurrence
 dupes_mask = df.duplicated(subset=key_cols, keep=False)
 
 # remove all but the last occurrence of each duplicated pair
 df = df.drop_duplicates(subset=key_cols, keep='last').reset_index(drop=True)
-
-#print(df.info())
-
 
 # prepare the plot
 fig, ax = plt.subplots(figsize=(14, 8))
@@ -54,7 +51,6 @@ df_mean = (
         .mean()
         .reset_index()
 )
-
 
 
 # plot mean high (thick solid) and mean low (thick dashed)

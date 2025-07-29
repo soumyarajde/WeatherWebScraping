@@ -219,21 +219,11 @@ class WeatherDataManager:
             source (str): Name of the weather data source.
         """
 
-        # date_key = datetime.date.today().isoformat()
-        # with h5py.File(hdf5_file, 'a') as h5f:
-        #     day_grp = h5f.require_group(date_key)
-        #     src_grp = day_grp.require_group(source)
-        #     if 'high_temp' in src_grp:
-        #         del src_grp['high_temp']
-        #     if 'low_temp' in src_grp:
-        #         del src_grp['low_temp']
-        #     src_grp.create_dataset('high_temp', data=high_temp)
-        #     src_grp.create_dataset('low_temp',  data=low_temp)
+        
 
         # Get the current date in ISO format
         date_key = datetime.date.today().isoformat()
-        print(date_key)
-
+       
         # Create a DataFrame with a single row of the current data
         df = pd.DataFrame({
             'date': [date_key],
