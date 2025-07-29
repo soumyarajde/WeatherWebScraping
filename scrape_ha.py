@@ -3,6 +3,7 @@ Automates the Home Assistant login process with Selenium.
 
 
 """
+
 import os
 import sys
 import time
@@ -27,18 +28,20 @@ if not all([HA_USER, HA_PASS]):
 
 # --- webdriver setup ---------------------------------------------------------
 chrome_options = Options()
-chrome_options.add_argument("--headless=new")   # comment out for a visible browser
+chrome_options.add_argument("--headless=new")  # comment out for a visible browser
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--window-size=1920,1080")
 
 driver = webdriver.Chrome(options=chrome_options)
 wait = WebDriverWait(driver, 20)
 
+
 def find_in_shadow(root, selector):
     """
     Locate an element inside a shadow root using a CSS selector.
     """
     return wait.until(lambda dr: root.find_element(By.CSS_SELECTOR, selector))
+
 
 try:
     # Login to Home Assistant
@@ -54,16 +57,22 @@ try:
         "ha-auth-textfield > label > input"
     )
 
-    username_input = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, user_selector)))
+    username_input = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, user_selector))
+    )
     username_input.clear()
     username_input.send_keys(HA_USER)
 
-    password_input = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, pass_selector)))
+    password_input = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, pass_selector))
+    )
     password_input.clear()
     password_input.send_keys(HA_PASS)
     password_input.send_keys(Keys.RETURN)
 
-    wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "body > home-assistant")))
+    wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, "body > home-assistant"))
+    )
     print(f"Logged in successfully to {HA_URL}")
 
     # Navigate to the Lovelace temperature dashboard
@@ -73,7 +82,9 @@ try:
     print(f"Navigated to {temperature_url}")
 
     # Drill into nested shadow DOM to reach the statistic cards
-    ha_root = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "body > home-assistant")))
+    ha_root = wait.until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "body > home-assistant"))
+    )
     shadow1 = ha_root.shadow_root
 
     main_panel = find_in_shadow(shadow1, "home-assistant-main")
@@ -82,7 +93,9 @@ try:
     drawer = find_in_shadow(shadow2, "ha-drawer")
     shadow3 = drawer
 
-    lovelace_container = find_in_shadow(shadow3, "partial-panel-resolver > ha-panel-lovelace")
+    lovelace_container = find_in_shadow(
+        shadow3, "partial-panel-resolver > ha-panel-lovelace"
+    )
     shadow4 = lovelace_container.shadow_root
 
     hui_root = find_in_shadow(shadow4, "hui-root")
@@ -92,44 +105,57 @@ try:
     masonry = find_in_shadow(view, "hui-masonry-view").shadow_root
 
     # Locate the "Outside Temperature Min Yesterday" statistic card
-    min_stat_card = find_in_shadow(masonry, "div > div > hui-card:nth-child(1) > hui-statistic-card")
+    min_stat_card = find_in_shadow(
+        masonry, "div > div > hui-card:nth-child(1) > hui-statistic-card"
+    )
     min_shadow = min_stat_card.shadow_root
     min_info_host = find_in_shadow(min_shadow, "ha-card")
     min_info = find_in_shadow(min_info_host, "div.info")
 
     min_value = find_in_shadow(min_info, "span.value").text.strip()
-    low_temp=float(min_value)
+    low_temp = float(min_value)
 
-    min_unit  = find_in_shadow(min_info, "span.measurement").text.strip()
+    min_unit = find_in_shadow(min_info, "span.measurement").text.strip()
     print(f"Outside Temperature Min Yesterday: {min_value}{min_unit}")
 
     # Locate the "Outside Temperature Max Yesterday" statistic card
-    max_stat_card = find_in_shadow(masonry, "div > div > hui-card:nth-child(2) > hui-statistic-card")
+    max_stat_card = find_in_shadow(
+        masonry, "div > div > hui-card:nth-child(2) > hui-statistic-card"
+    )
     max_shadow = max_stat_card.shadow_root
     max_info_host = find_in_shadow(max_shadow, "ha-card")
     max_info = find_in_shadow(max_info_host, "div.info")
 
     max_value = find_in_shadow(max_info, "span.value").text.strip()
-    high_temp= float(max_value)
-    max_unit  = find_in_shadow(max_info, "span.measurement").text.strip()
+    high_temp = float(max_value)
+    max_unit = find_in_shadow(max_info, "span.measurement").text.strip()
     print(f"Outside Temperature Max Yesterday: {max_value}{max_unit}")
 
     # Store data in HDF5 file
     # Date string is set to  yesterday
     date_str = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
-    df = pd.DataFrame({
-    'date': [date_str],
-    'source': ["home_assistant"],
-    'high_temp': [high_temp],
-    'low_temp': [low_temp]
-            })
+    df = pd.DataFrame(
+        {
+            "date": [date_str],
+            "source": ["home_assistant"],
+            "high_temp": [high_temp],
+            "low_temp": [low_temp],
+        }
+    )
     # Append the data to an HDF5 file in table format
     # Use 'a' mode to append data, and 'weather_data' as the key in the store
-    df.to_hdf("weather_combined_sort_v2.h5", key='weather', mode='a', format='table',append=True, data_columns=True)
+    df.to_hdf(
+        "weather_combined_sort_v2.h5",
+        key="weather",
+        mode="a",
+        format="table",
+        append=True,
+        data_columns=True,
+    )
 
     time.sleep(5)  # pause for headless debug
-   
+
 
 finally:
     driver.quit()
