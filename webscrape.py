@@ -288,7 +288,6 @@ class WeatherDataManager:
                 src_cls = source_classes[source]
                 src_instance = src_cls(url)
                 high_temp, low_temp = src_instance.get_high_low()
-                print(f"{source:<15} → High: {high_temp}°C | Low: {low_temp}°C")
                 self.store_in_hdf5(high_temp, low_temp, hdf5_path, source)
 
         print(f"All values stored in {hdf5_path}")

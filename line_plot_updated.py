@@ -75,7 +75,7 @@ ax.xaxis.set_major_locator(mdates.DayLocator())
 ax.xaxis.set_major_formatter(mdates.DateFormatter(f"%d-%m-%Y"))
 
 ax.set_xlabel("Date")
-ax.set_ylabel("Temperature")
+ax.set_ylabel("Temperature (°C)")
 ax.set_title("High/Low Temperatures by Source")
 ax.legend(loc="best")
 fig.autofmt_xdate()
